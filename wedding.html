@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Booking Form</title>
+    <style>
+        /* Container for the entire page */
+        .container {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f3f3f3;
+        }
+
+        /* Image container */
+        .image-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #dcdcdc;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Form container */
+        .form-container {
+            flex: 1;
+            padding: 40px;
+            background-color: lavender;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Form header */
+        .form-container h1 {
+            margin-bottom: 20px;
+            color: #4e4e4e;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Form fields */
+        .form-container form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Proper spacing between fields */
+            width: 100%; /* Ensure full width */
+            max-width: 400px; /* Limit width for better readability */
+        }
+
+        .form-container label {
+            margin-bottom: 5px;
+            color: #4e4e4e;
+        }
+
+        .form-container input[type="text"],
+        .form-container input[type="email"],
+        .form-container input[type="tel"],
+        .form-container input[type="date"],
+        .form-container select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px; /* Rounded corners */
+            background-color: rgba(255, 255, 255, 0.8);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        /* Form button */
+        .form-container button[type="submit"] {
+            padding: 12px;
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+            border-radius: 20px; /* Rounded corners */
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%; /* Ensure full width */
+        }
+
+        .form-container button[type="submit"]:hover {
+            background-color: #e45f53;
+        }
+
+        /* Custom focus styles */
+        .form-container input:focus,
+        .form-container select:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 111, 97, 0.5);
+            border-color: #ff6f61;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-container">
+            <img src="wedd.jpg" alt="Event Image">
+        </div>
+        <div class="form-container">
+            <h1>Book Your Event</h1>
+            <form id="event-booking-form" action="event.php" method="post">
+                <div class="full-width">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="full-width">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="full-width">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone" name="phone" maxlength="10" required>
+                </div>
+                <div class="full-width">
+                    <label for="district">District:</label>
+                    <input type="text" id="district" name="district" required>
+                </div>
+                <div class="full-width">
+                    <label for="state">State:</label>
+                    <input type="text" id="state" name="state" required>
+                </div>
+                <div class="full-width">
+                    <label for="preferredDate">Preferred Date:</label>
+                    <input type="date" id="preferredDate" name="preferredDate" required>
+                </div>
+                <div class="full-width">
+                    <label for="brideGroomName">Bride/Groom Name:</label>
+                    <input type="text" id="brideGroomName" name="brideGroomName" required>
+                </div>
+                <div class="full-width">
+                    <label for="placeOfEvent">Place of Event:</label>
+                    <input type="text" id="placeOfEvent" name="placeOfEvent" required>
+                </div>
+                <div class="full-width">
+                    <label for="eventType">Event Type:</label>
+                    <select id="eventType" name="eventType" required>
+                        <option value="" disabled selected>Select Event Type</option>
+                        <option value="Wedding">Wedding</option>
+                        <option value="Birthday">Birthday</option>
+                        <option value="Corporate">Corporate</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="full-width">
+                    <label for="guestCount">Number of Guests:</label>
+                    <input type="number" id="guestCount" name="guestCount" required>
+                </div>
+                <div class="full-width">
+                    <label for="additionalInfo">Additional Information:</label>
+                    <textarea id="additionalInfo" name="additionalInfo" rows="4"></textarea>
+                </div>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+                        

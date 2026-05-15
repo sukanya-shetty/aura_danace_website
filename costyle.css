@@ -1,0 +1,141 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+body{
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    background: url(bg.jpg);
+    background-size: cover;
+}
+
+.container{
+    width: 100%;
+    max-width: 650px;
+    background: rgba(0,0,0,0.5);
+    padding: 28px;
+    margin: 0 28px;
+    border-radius: 10px;
+    box-shadow: inset -2px 2px 2px white;
+}
+
+.form-title{
+   font-size: 26px;
+   font-weight: 600;
+   text-align: center;
+   padding-bottom: 6px;
+   color: white;
+   text-shadow: 2px 2px 2px black;
+   border-bottom: solid 1px white; 
+}
+
+.main{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 20px 0;
+}
+
+.user:nth-child(2n){
+    justify-content: end;
+}
+
+.user{
+    display: flex;
+    flex-wrap: wrap;
+    width: 50%;
+    padding-bottom: 15px;
+}
+
+.user label{
+    width: 95%;
+    color: wheat;
+    font-size: 20px;
+    font-weight: 400;
+    margin: 5px 0;
+}
+
+.user input,select{
+    height: 20px;
+    width: 95%;
+    border-radius: 7px;
+    outline: none;
+    border: 1px soloid grey;
+    padding: 0 10px;
+}
+
+.gender-title{
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+    border-radius: 1px solid white;
+}
+
+.gender-cat{
+    margin: 15px 0;
+    color: white;
+}
+
+.gender-cat label{
+    padding: 0 20px 0 5px;
+}
+
+.gender-cat label,.gender-cat input,.form-submit input{
+    cursor: pointer;
+}
+
+.form-submit{
+    margin-top: 40px;
+}
+
+.form-submit input{
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    font-size: 20px;
+    padding: 10px;
+    border: none;
+    border-radius: 3px;
+    color: rgb(209,209,209);
+    background: #987ac4;
+}
+
+.form-submit input:hover{
+    background: #562e93;
+    color: rgb(255,255,255);
+}
+
+@media(max-width:600px){
+    .container{
+        max-width: 280px;
+    }
+
+    .user{
+        margin-bottom: 12px;
+        width: 100%;
+    }
+
+    .user:nth-child(2n){
+        justify-content: space-between;
+    }
+
+    .gender-cat{
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .main{
+        max-height: 380px;
+        overflow: auto;
+    }
+
+    .main::-webkit-scrollbar{
+        width: 0;
+    }
+}

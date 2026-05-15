@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dance Events Announcement</title>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+    font-family: Arial, sans-serif;
+  }
+  .announcement {
+    font-size: 2em;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    animation: fadeIn 3s ease-in-out infinite alternate;
+  }
+  @keyframes fadeIn {
+    0% { opacity: 0; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+</style>
+</head>
+<body>
+  <div class="announcement">
+    We are excited to announce that we will soon be introducing dance events for birthday parties!
+  </div>
+</body>
+</html>

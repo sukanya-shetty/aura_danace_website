@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login Form</title>
+    <link rel="stylesheet" href="wwstyle.css" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+</head>
+<body>
+    <div class="box">
+        <form action="adminlog.php" method="post">
+            <h2>Login</h2>
+            <div class="inputbx">
+                <input type="text" name="uname" required>
+                <span>Username</span>
+                <i></i>
+            </div>
+            <div class="inputbx">
+                <input type="password" name="password" id="password" required>
+                <span >Password</span>
+                <i id="togglepassword"></i>
+            </div>
+            <input type="submit" value="Login">
+        </form>
+    </div>
+    <script src="scriptad.js"></script>
+</body>
+</html>

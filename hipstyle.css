@@ -1,0 +1,236 @@
+*{
+    font-family:monsterrat;
+}
+body{
+    background:f1fbff;
+}
+.section-padding{
+    padding:100px 0;
+}
+.carousel-item{
+    height:100vh;
+    min-height:300px;
+}
+.carousel-caption{
+    bottom:220px;
+    z-index:2;
+}
+.carousel-caption h5{
+    font-size:45px;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    margin-top:25px;
+}
+.carousel-caption p{
+    width:60%;
+    margin:auto;
+    font-size:18px;
+    line-height:1.9;
+}
+.carousel-inner::before{
+    content:'';
+    position:absolute;
+    width:100%;
+    height:100%;
+    top:0;
+    left:0;
+    background:rgba(0, 0, 0, 0.7);
+    z-index:1;
+}
+nav img{
+    width:50px;
+    border-radius:50%;
+    margin-left:-50px;
+}
+.navbar-nav a{
+    font-size:15px;
+    text-transform:uppercase;
+    font-weight:500;
+}
+.navbar-light .navbar-brand{
+    color:#000;
+    font-size:25px;
+    text-transform:uppercase;
+    font-weight:700;
+    letter-spacing:2px;
+}
+.navbar-light .navbar-brand:focus,
+.navbar-light .navbar-brand:hover{
+    color:#000;
+}
+.navbar-light .navbar-nav .navbar-link{
+    color:#000;
+}
+.w-100{
+    height:100vh;
+}
+@media only screen and(min-width:768px) and (max-width:991px){
+    .carousel-caption{
+        bottom:370px;
+    }
+    .carousel-caption p{
+        width:100%;
+    }
+}
+@media only screen and(max-width:767px){
+    .navbar-nav{
+        text-align:center;
+    }
+    .carousel-caption{
+        bottom:125px;
+    }
+    .carousel-caption h5{
+        font-size:17px;
+    }
+    .carousel-caption a{
+        padding:10px 15px;
+    }
+    .carousel-caption p{
+        width:100%;
+        line-height:1.6;
+        font-size:12px;
+    }
+}
+.footer{
+    width:100%;
+    text-align:center;
+    padding:30px 0;
+    background:#111;
+}
+
+.footer h3{
+     color:white;
+}
+.icons{
+   display:flex;
+   justify-content:center;
+}
+.icons .fa{
+    text-decoration:none;
+    padding:10px;
+    background-color:white;
+    margin:10px;
+    border-radius:50%;
+}
+.icons .fa i{
+    font-size:2em;
+    color:black;
+    opacity:0.9;
+}
+.icons .fa:hover{
+    background-color:#111;
+    transition:0.5s;
+}
+icons .fa:hover i{
+    color:white;
+    transition:0.5s;
+}
+.footernav{
+    margin:30px 0;
+}
+.footernav ul{
+    display:flex;
+    justify-content:center;
+    list-style-type:none;
+}
+.footernav ul li a{
+    color:white;
+    margin:20px;
+    text-decoration:none;
+    font-size:1.3em;
+    opacity:0.7;
+    transition:0.5s;
+}
+.footernav ul li a:hover{
+    opacity:1;
+}
+@media(max-width:700px){
+    .footernav ul{
+        flex-direction:column;
+    }
+    .footernav ul li{
+        width:100%;
+        text-align:center;
+        margin:10px;
+    }
+}
+.course{
+    width:80%;
+    margin:auto;
+    text-align:center;
+    padding-top:100px;
+}
+
+h1{
+    font-size:36px;
+    font-weight:600;
+}
+p{
+    color:#fff;
+    font-size:14px;
+    font-weight:300;
+    line-height:22px;
+    padding:10px;
+}
+.row{
+    margin-top:5%;
+    display:flex;
+    justify-content:space-between;
+}
+.course-col{
+    flex-basis:31%;
+    background:#009688;
+    border-radius:10px;
+    margin-bottom:5%;
+    padding:20px 12px;
+    box-sizing:border-box;
+    transition:0.5s;
+}
+h3{
+    text-align:center;
+    font-weight:600;
+    margin:10px 0;
+}
+.course-col:hover{
+    box-shadow:0 0 20px 0px rgba(170,51,106);
+}
+
+@media(max-width:700px){
+    .row{
+        flex-direction:column;
+    }
+}
+.forms{
+   width:80%;
+   margin:auto;
+   text-align:center;
+   padding-top:100px;
+}
+.forms-col{
+    flex-basis:31%;
+    border-radius:10px;
+    margin-bottom:5%;
+    position:relative;
+    overflow:hidden;
+    text-align:left;
+}
+.forms-col img{
+    width:100%;
+    border-radius:10px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: white;
+    background-color: #009688;
+    border: 2px solid #009688;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .btn:hover {
+    background-color: skyblue;
+    border-color: skyblue;
+  }

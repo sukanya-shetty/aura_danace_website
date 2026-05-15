@@ -1,0 +1,209 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Booking Form</title>
+    <style>
+      
+/* Form container */
+.form-container {
+    width: 800px;
+    margin: 50px auto;
+    padding: 40px;
+    background-color: #907fcd; /* Changed to lavender */
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Form header */
+.form-container h1 {
+    margin-bottom: 20px;
+    color: #fff;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Form fields */
+.form-container form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 40px; /* Adjust the gap between columns and rows */
+}
+
+.form-container label {
+    display: block;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.form-container input[type="text"],
+.form-container input[type="email"],
+.form-container input[type="tel"],
+.form-container input[type="number"],
+.form-container input[type="date"],
+.form-container select,
+.form-container textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.8);
+    transition: background-color 0.3s, border-color 0.3s;
+    margin-bottom: 20px; /* Space between each field */
+}
+
+.form-container input[type="text"]:focus,
+.form-container input[type="email"]:focus,
+.form-container input[type="tel"]:focus,
+.form-container input[type="number"]:focus,
+.form-container input[type="date"]:focus,
+.form-container select:focus,
+.form-container textarea:focus {
+    background-color: #fff;
+    border-color: #ff6f61;
+}
+
+.form-container textarea {
+    height: 100px;
+    grid-column: span 2;
+}
+
+/* Form button */
+.form-container button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #42508f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    grid-column: span 2;
+}
+
+.form-container button[type="submit"]:hover {
+    background-color: #070f54;
+}
+
+/* Custom focus styles */
+.form-container input:focus,
+.form-container select:focus,
+.form-container textarea:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(255, 111, 97, 0.5);
+    border-color: #ff6f61;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+    </style>
+</head>
+<body>
+    <!-- Your form HTML code goes here -->
+<section class="form-container">
+        <h1>Book Your Event</h1>
+        <form id="event-Booking-form" action="event.php" method="post">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" maxlength="10" required>
+            </div>
+            <div>
+                <label for="district">District:</label>
+                <input type="text" id="district" name="district" required>
+            </div>
+            <div>
+                <label for="state">State:</label>
+                <input type="text" id="state" name="state" required>
+            </div>
+            <div>
+                <label for="preferredDate">Preferred Date:</label>
+                <input type="date" id="preferredDate" name="preferredDate" required>
+            </div>
+            <div>
+                <label for="preferredTime">Preferred Time:</label>
+                <select id="preferredTime" name="preferredTime" required>
+                    <option value="morning">Morning</option>
+                    <option value="afternoon">Afternoon</option>
+                </select>
+            </div>
+            <div>
+                <label for="birthdayKidName">Name of the Birthday Kid:</label>
+                <input type="text" id="birthdayKidName" name="birthdayKidName" required>
+            </div>
+            <div>
+                <label for="ageTurning">What age they are turning:</label>
+                <input type="number" id="ageTurning" name="ageTurning" min="1" required>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+    </section>
+ 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('event-Booking-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+    
+            // Retrieve form values
+            var district = document.getElementById('district').value;
+            var state = document.getElementById('state').value;
+            var preferredDate = new Date(document.getElementById('preferredDate').value);
+            var today = new Date();
+            var tomorrow = new Date();
+            tomorrow.setDate(today.getDate() + 1);
+            var dayAfterTomorrow = new Date();
+            dayAfterTomorrow.setDate(today.getDate() + 2);
+    
+            // Check if state is Karnataka
+            if (state.toLowerCase() !== 'karnataka') {
+                alert("Sorry, our service is limited to within Karnataka.");
+                return; // Stop further execution
+            }
+    
+            // Check if district is Udupi
+            if (district.toLowerCase() !== 'udupi') {
+                alert("We can't reach you. Please make sure you are in Udupi district.");
+                return; // Stop further execution
+            }
+    
+            // Check if preferred date is today or in the past
+            if (preferredDate <= today) {
+                alert("Please select a date after today.");
+                return; // Stop further execution
+            }
+    
+            // Check if preferred date is within the next two days
+            if (preferredDate <= dayAfterTomorrow) {
+                alert("Please select a date after three days.");
+                return; // Stop further execution
+            }
+    
+            // If everything is fine, proceed with form submission
+            alert("Event booked successfully!");
+            // You can submit the form here if needed: event.target.submit();
+        });
+    });
+    </script>
+</body>
+</html>

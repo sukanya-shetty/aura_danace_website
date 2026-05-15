@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login ad Sign-up form</title>
+    <link rel="stylesheet" type="text/css" href="slide1.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+</head>
+<body>
+    <img src="dance-unscreen.gif" alt="dance-unscreen" width="40%" height="40%" style="margin-left: -35%;">
+    <div class="main">
+        <input type="checkbox" id="chk" aria-hidden="true">
+
+        <div class="signup">
+         <form action="log.php" method="post">
+            <label for="chk" aria-hidden="true">Sign Up</label>
+            <input type="text" name="uname" placeholder="User name" pattern="^[A-Za-z]+$" title="Please enter only alphabets">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="text" name="mno" placeholder="Phone Number" pattern="[0-9]+" minlength="10" maxlength="10" required>
+            <input type="password" name="password" id="password" placeholder="Password" required>
+            <span class="password-toggle-icon"><i class="fas fa-eye"></i></span>
+            <input type="password" name="cpass" id="cpass" placeholder="Confirm Password" required>
+            <span class="cpass-toggle-icon"><i class="fas fa-eye"></i></span>
+            <button>Sign Up</button>
+         </form>
+        </div>
+        <script src="script.js"></script>
+
+        <div class="login">
+            <form action="log1log.php" method="post">
+                <label for="chk" aria-hidden="true">Login</label>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="passw" id="passw" placeholder="Password" required>
+                <span class="passw-toggle-icon"><i class="fas fa-eye"></i></span>
+                <button>Login</button>
+                <button><a href="forgot.php" style="color: white;text-decoration: none;">Forgot Password</a></button>
+            </form>
+        </div>
+        <script src="script2.js"></script>
+    </div>
+</body>
+</html>

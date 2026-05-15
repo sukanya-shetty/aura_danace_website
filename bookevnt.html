@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" >
+    <link rel="stylesheet" href="style1.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Event Booking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #f4e4f4, #e8d5e8, #d9c2d9);
+            margin: 0;
+            padding: 0;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .intro-text {
+            margin: 20px;
+            text-align: center;
+            animation: fadeIn 2s;
+        }
+
+        .intro-text h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .intro-text p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #ae348a;
+        }
+
+        .booking-options {
+            display: flex;
+            justify-content: center;
+            margin: 20px;
+            flex-wrap: wrap;
+        }
+
+        .option {
+            background-color: #fff;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: slideInUp 2s;
+        }
+
+        .option img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .option h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .option p {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .option button {
+            background-color: #ae348a;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .option button:hover {
+            background-color: #510138;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" ></script>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container">
+            <a href="index.html"><img src="aura.jpg" alt=""></a>
+          <a class="navbar-brand" href="#">Aura</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="bootstrap.html">Home</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Events
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <!--<li><a class="dropdown-item" href="#">Past Events</a></li>-->
+                  <li><a class="dropdown-item" href="bookevnt.html">Book Events</a></li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Course
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <li><a class="dropdown-item" href="dancecat.php">Available Dance Courses</a></li>
+
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="about.html">About</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="Login.html" name="logout">Login</a>
+              </li>
+              
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+    <div class="intro-text" style="padding-top:50px;">
+        <h1>Welcome to Our Dance Event Booking Page</h1>
+        <p style="color: black;">Experience the magic of dance with our <span class="highlight">talented group</span>. Our performers are skilled in a variety of dance styles, from contemporary to classical, ensuring that every event is <span class="highlight">unique and memorable</span>.</p>
+        <p style="color: black;">Our dance group has been <span class="highlight">captivating audiences</span> for years with their energetic and graceful performances. Whether it's a birthday celebration or a wedding, our dancers know how to bring <span class="highlight">excitement and elegance</span> to your special occasion. Book our dance group today and let us make your event <span class="highlight">unforgettable</span>.</p>
+    </div>
+
+    <div class="image-text">
+        <p style="color: black;">Book our dance group for your special event:</p>
+    </div>
+
+    <section class="booking-options">
+        <div class="option">
+            <img src="birthday.jpeg" alt="Birthday Event">
+            <h2>Book Event for Birthday</h2>
+            <p>Make your birthday special with our exciting packages. Our dancers will bring energy and joy to your celebration.</p>
+            <button onclick="bookEvent('birthday')">Book Now</button>
+        </div>
+        <div class="option">
+            <img src="marriage.jpeg" alt="Marriage Event">
+            <h2>Book Event for Marriage</h2>
+            <p>Celebrate your special day with our exclusive wedding packages. Our dancers will create unforgettable memories.</p>
+            <button onclick="bookEvent('marriage')">Book Now</button>
+        </div>
+    </section>
+
+    <section class="footer">
+        <h3>Connect with us</h3>
+        <div class="icons">
+            <a href=""><i class="fa fa-facebook"></i></a>
+            <a href=""><i class="fa fa-twitter"></i></a>
+            <a href=""><i class="fa fa-instagram"></i></a>
+            <a href=""><i class="fa fa-linkedin"></i></a>
+        </div>
+        <div class="footernav">
+            <ul>
+                <li><a href="">Home</a></li>
+                <li><a href="">News</a></li>
+                <li><a href="">About</a></li>
+                <li><a href="">Contact us</a></li>
+                <li><a href="">Our team</a></li>
+            </ul>
+        </div>
+    </section>
+        <script>
+            var navlinks=document.getElementById("navLinks");
+            function showMenu(){
+                navLinks.style.right="0";
+            }
+            function hideMenu(){
+                navLinks.style.right="-200px";
+            }
+        </script>
+
+    <script>
+        function bookEvent(eventType) {
+            if (eventType === 'birthday') {
+                window.location.href = 'birthday.html';
+            } else if (eventType === 'marriage') {
+                window.location.href = 'boo.html';
+            } else {
+                alert("Unknown event type selected!");
+            }
+        }
+    </script>
+</body>
+</html>

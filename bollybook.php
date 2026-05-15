@@ -1,0 +1,286 @@
+<?php
+session_start();
+if(!isset($_SESSION["log"])){
+    header(("Location:Login.html"));
+    exit();
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Booking Form</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .image-container {
+            flex: 1;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .form-container {
+            flex: 1;
+            padding: 40px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            background-color: lavender;
+            border-radius: 0 20px 20px 0;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .form-container h1 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="date"],
+        .form-group select,
+        .form-group textarea {
+            width: calc(100% - 24px);
+            padding: 10px;
+            border: 1px solid transparent;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: 2px solid #000;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+        /* Popup Styles */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        .popup h2 {
+            margin-top: 0;
+        }
+
+        .popup input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .popup button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup button.close {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="image-container">
+        <img src="bolley.jpg" alt="Event Image">
+    </div>
+    <div class="form-container">
+        <h1>Book Your Event</h1>
+        <form id="eventBookingForm" action="bollypay.php" method="post">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" maxlength="10" required>
+            </div>
+            <div class="form-group">
+                <label for="district">District:</label>
+                <input type="text" id="district" name="district" required>
+            </div>
+            <div class="form-group">
+                <label for="state">State:</label>
+                <input type="text" id="state" name="state" required>
+            </div>
+            <div class="form-group">
+                <label for="preferredDate">Preferred Date:</label>
+                <input type="date" id="preferredDate" name="preferredDate" required>
+            </div>
+            <div class="form-group">
+                <label for="preferredTime">Preferred Time:</label>
+                <select id="preferredTime" name="preferredTime" required>
+                    <option value="morning">Morning</option>
+                    <option value="afternoon">Afternoon</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="bgName">Name of the Bride/Groom:</label>
+                <input type="text" id="bgName" name="bgName" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Enter Your Address:</label>
+                <textarea name="address" id="address" rows="4" required></textarea>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div class="popup-overlay" id="popupOverlay"></div>
+<div class="popup" id="paymentPopup">
+    <h2>Enter Payment Details</h2>
+    <form id="paymentDetailsForm" action="bollypay.php" method="post">
+        <input type="hidden" id="namePayment" name="name">
+        <input type="hidden" id="emailPayment" name="email">
+        <input type="hidden" id="phonePayment" name="phone">
+        <input type="hidden" id="districtPayment" name="district">
+        <input type="hidden" id="statePayment" name="state">
+        <input type="hidden" id="preferredDatePayment" name="preferredDate">
+        <input type="hidden" id="preferredTimePayment" name="preferredTime">
+        <input type="hidden" id="bgNamePayment" name="bgName">
+        <input type="hidden" id="addressPayment" name="address">
+        <input type="text" id="amount" name="amount" value="500" readonly>
+        <input type="text" id="cardNumber" name="cardNumber" placeholder="Enter your card number" required>
+        <button type="submit">OK</button>
+        <button type="button" class="close" id="closePopup">Close</button>
+    </form>
+</div>
+
+<script>
+document.getElementById('eventBookingForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    var district = document.getElementById('district').value.toLowerCase();
+    var state = document.getElementById('state').value.toLowerCase();
+    var preferredDate = new Date(document.getElementById('preferredDate').value);
+    var today = new Date();
+    var tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    var dayAfterTomorrow = new Date();
+    dayAfterTomorrow.setDate(today.getDate() + 2);
+
+    if (state !== 'karnataka') {
+        alert("Sorry, our service is limited to within Karnataka.");
+        return;
+    }
+
+    if (district !== 'udupi') {
+        alert("We can't reach you. Please make sure you are in Udupi district.");
+        return;
+    }
+
+    if (preferredDate <= today) {
+        alert("Please select a date after today.");
+        return;
+    }
+
+    if (preferredDate <= dayAfterTomorrow) {
+        alert("Please select a date after three days.");
+        return;
+    }
+
+    var form = document.getElementById('eventBookingForm');
+    var popup = document.getElementById('paymentPopup');
+
+    document.getElementById('namePayment').value = document.getElementById('name').value;
+    document.getElementById('emailPayment').value = document.getElementById('email').value;
+    document.getElementById('phonePayment').value = document.getElementById('phone').value;
+    document.getElementById('districtPayment').value = document.getElementById('district').value;
+    document.getElementById('statePayment').value = document.getElementById('state').value;
+    document.getElementById('preferredDatePayment').value = document.getElementById('preferredDate').value;
+    document.getElementById('preferredTimePayment').value = document.getElementById('preferredTime').value;
+    document.getElementById('bgNamePayment').value = document.getElementById('bgName').value;
+    document.getElementById('addressPayment').value = document.getElementById('address').value;
+
+    document.getElementById('popupOverlay').style.display = 'block';
+    popup.style.display = 'block';
+});
+
+document.getElementById('closePopup').addEventListener('click', function() {
+    document.getElementById('popupOverlay').style.display = 'none';
+    document.getElementById('paymentPopup').style.display = 'none';
+});
+</script>
+</body>
+</html>
