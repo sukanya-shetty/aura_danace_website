@@ -91,75 +91,139 @@ input[type="submit"]:active{
 </head>
 <body>
 <img src="tiktok-dance-unscreen-ezgif.com-resize.gif" alt=""  style="margin-left: -15%;">
-    <?php
-     $server='localhost';
-      $uname='root';
-     $password='';
-     $db='aura_dance';
-     $conn=new mysqli($server,$uname,$password,$db);
+<?php
+require 'config.php';
 
-     if($conn->connect_error){
-       die("Connection failed: ".$conn->connect_error);
-     }
-
+try {
      if($_GET['email'] && isset($_GET['reset_token'])){
         $email=$_GET['email'];
         $token=$_GET['reset_token'];
         date_default_timezone_set("Asia/Kolkata");
-        $date=date("Y-m-d");
-        $query="SELECT * FROM users WHERE email='$email' AND reset_token='$token' AND reset_at='$date'";
-        $result=$conn->query($query);
-        if($result){
-            if(mysqli_num_rows($result)==1){
-                echo"<div class='card'>
-                <p class='lock-icon'><i class='fas fa-lock'></i></p>
-                <h1>Create New Password</h1>
-                <p>You can reset your Password here</p><br>
-                <form method='post' action=''>
-                  <h3>Enter email</h3>
-                  <input type='password' placeholder='New Password' name='password' required>
-                  <button type='submit' name='updatepassword'>Update</button>
-                  <input type='hidden' name='email' value='$_GET[email]'>
-                </form>
-                </div>";
-
-            }else{
-                echo("<script language='javascript'>
-                window.alert('Invalid or Expired Link')
-                window.location.href='forgot.php'
-                </script>");
-                exit();
-            }
+        
+        // Sanitize inputs
+        $email = isset($_GET['email']) ? trim($_GET['email']) : '';
+        $token = isset($_GET['reset_token']) ? trim($_GET['reset_token']) : '';
+        
+        // Validate inputs
+        if(empty($email) || empty($token) || !filter_var($email, FILTER_VALIDATE_EMAIL)){
+            throw new Exception('Invalid reset link');
+        }
+        
+        $date = date("Y-m-d");
+        
+        // Query using prepared statement
+        $stmt = $conn->prepare("SELECT user_id FROM users WHERE email = ? AND reset_token = ? AND reset_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)");
+        if(!$stmt){
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+        
+        $stmt->bind_param("ss", $email, $token);
+        if(!$stmt->execute()){
+            throw new Exception("Execute failed: " . $stmt->error);
+        }
+        
+        $result = $stmt->get_result();
+        
+        if($result->num_rows == 1){
+            // Display form
+            $emailEscaped = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
+            
+            echo "<div class='card'>
+            <p class='lock-icon'><i class='fas fa-lock'></i></p>
+            <h1>Create New Password</h1>
+            <p>You can reset your Password here</p><br>
+            <form method='post' action=''>
+              <h3>Enter New Password</h3>
+              <input type='password' placeholder='New Password' name='password' required minlength='6'>
+              <button type='submit' name='updatepassword'>Update</button>
+              <input type='hidden' name='email' value='" . $emailEscaped . "'>
+              <input type='hidden' name='token' value='" . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . "'>
+            </form>
+            </div>";
         }else{
+            throw new Exception('Invalid or Expired Link');
+        }
+        
+        $stmt->close();
+    }
+} catch (Exception $e) {
+     error_log("Password Reset Error: " . $e->getMessage());
+     echo("<script language='javascript'>
+     window.alert('" . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "')
+     window.location.href='forgot.php'
+     </script>");
+     exit();
+}
+     ?>
+
+     <?php
+     if(isset($_POST['updatepassword'])){
+        try {
+            // Sanitize input
+            $newPassword = $_POST['password'] ?? '';
+            $email = $_POST['email'] ?? '';
+            $token = $_POST['token'] ?? '';
+            
+            // Validation
+            if(empty($newPassword) || empty($email) || empty($token)){
+                throw new Exception('All fields are required');
+            }
+            
+            if(strlen($newPassword) < 6){
+                throw new Exception('Password must be at least 6 characters');
+            }
+            
+            if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+                throw new Exception('Invalid email');
+            }
+            
+            // Verify token and email match before updating
+            $verifyStmt = $conn->prepare("SELECT user_id FROM users WHERE email = ? AND reset_token = ?");
+            if(!$verifyStmt){
+                throw new Exception("Prepare failed");
+            }
+            
+            $verifyStmt->bind_param("ss", $email, $token);
+            if(!$verifyStmt->execute()){
+                throw new Exception("Verification failed");
+            }
+            
+            $verifyResult = $verifyStmt->get_result();
+            if($verifyResult->num_rows != 1){
+                throw new Exception('Invalid reset link');
+            }
+            $verifyStmt->close();
+            
+            // Hash new password
+            $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+            
+            // Update password using prepared statement
+            $updateStmt = $conn->prepare("UPDATE users SET password = ?, reset_token = NULL, reset_at = NULL WHERE email = ?");
+            if(!$updateStmt){
+                throw new Exception("Prepare failed");
+            }
+            
+            $updateStmt->bind_param("ss", $hashedPassword, $email);
+            if(!$updateStmt->execute()){
+                throw new Exception("Update failed");
+            }
+            $updateStmt->close();
+            
             echo("<script language='javascript'>
-            window.alert('Server down.Try again Later')
+            window.alert('Password reset successful. Please login with your new password.')
+            window.location.href='Login.html'
+            </script>");
+            exit();
+            
+        } catch (Exception $e) {
+            error_log("Password Update Error: " . $e->getMessage());
+            echo("<script language='javascript'>
+            window.alert('" . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "')
             window.location.href='forgot.php'
             </script>");
             exit();
         }
      }
      ?>
-
-     <?php
-      if(isset($_POST['updatepassword'])){
-        $passw=$_POST['password'];
-        // Hash new password for security using BCRYPT
-        $hashedPassword = password_hash($passw, PASSWORD_BCRYPT);
-        $update="UPDATE users SET password='$hashedPassword' , reset_token=NULL , reset_at=NULL WHERE email='$_POST[email]'";
-        if(mysqli_query($conn,$update)){
-            echo("<script language='javascript'>
-            window.alert('Password reset successful')
-            window.location.href='Login.html'
-            </script>");
-            exit();
-        } else{
-            echo("<script language='javascript'>
-            window.alert('Server down try again later')
-            window.location.href='forgot.php'
-            </script>");
-            exit();
-        }
-      }
-      ?>
 </body>
 </html>

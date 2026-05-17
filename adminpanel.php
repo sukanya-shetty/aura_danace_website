@@ -1,14 +1,5 @@
 <?php
-$server="localhost";
-$uname="root";
-$password="";
-$db='aura_dance';
-
-$conn=new mysqli($server,$uname,$password,$db);
-if($conn->connect_error)
-{
-    die("Connection failed:".$conn->connect_error);
-}
+require 'config.php';
 ?>
 
 <!DOCTYPE html>
@@ -31,11 +22,12 @@ if($conn->connect_error)
     
     <?php
     session_start();
-    //if(!isset($_SESSION['uname'])){
-     //   header("Location:ww.html");
-    //}
-    //exit;
-    //$name=$_SESSION['uname'];
+    // Enforce authentication
+    if(!isset($_SESSION['uname'])){
+        header("Location:ww.html");
+        exit;
+    }
+    $adminName = htmlspecialchars($_SESSION['uname'], ENT_QUOTES, 'UTF-8');
     ?>
 </head>
 <body>
@@ -60,7 +52,7 @@ if($conn->connect_error)
                 <div>
                     <i id="menu-btn" class="fas fa-bars"></i>
                 </div>
-                <div class="ad">Welcome , &nbsp;<?php echo "<h4 style='color:#ADA1E6;'>$_SESSION[uname]</h3>"?></div>
+                <div class="ad">Welcome , &nbsp;<?php echo "<h4 style='color:#ADA1E6;'>" . $adminName . "</h4>"?></div>
             </div>
 
             <div class="profile">
@@ -74,17 +66,37 @@ if($conn->connect_error)
 
         <div class="values">
         <?php
-             // Get total statistics
-             $totalStudents = $conn->query("SELECT COUNT(*) as count FROM students")->fetch_assoc()['count'];
-             $totalCourses = $conn->query("SELECT COUNT(*) as count FROM courses")->fetch_assoc()['count'];
-             $totalEnrollments = $conn->query("SELECT COUNT(*) as count FROM enrollments")->fetch_assoc()['count'];
-             $totalRevenue = $conn->query("SELECT COALESCE(SUM(amount), 0) as total FROM payments")->fetch_assoc()['total'];
-             
-             // Display key metrics
-             echo "<div class='val-box'>
+        try {
+            // Get total statistics using prepared statements
+            $studentStmt = $conn->prepare("SELECT COUNT(*) as count FROM students");
+            if(!$studentStmt) throw new Exception("Prepare failed");
+            $studentStmt->execute();
+            $totalStudents = $studentStmt->get_result()->fetch_assoc()['count'];
+            $studentStmt->close();
+            
+            $courseStmt = $conn->prepare("SELECT COUNT(*) as count FROM courses");
+            if(!$courseStmt) throw new Exception("Prepare failed");
+            $courseStmt->execute();
+            $totalCourses = $courseStmt->get_result()->fetch_assoc()['count'];
+            $courseStmt->close();
+            
+            $enrollStmt = $conn->prepare("SELECT COUNT(*) as count FROM enrollments");
+            if(!$enrollStmt) throw new Exception("Prepare failed");
+            $enrollStmt->execute();
+            $totalEnrollments = $enrollStmt->get_result()->fetch_assoc()['count'];
+            $enrollStmt->close();
+            
+            $revenueStmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payments");
+            if(!$revenueStmt) throw new Exception("Prepare failed");
+            $revenueStmt->execute();
+            $totalRevenue = $revenueStmt->get_result()->fetch_assoc()['total'];
+            $revenueStmt->close();
+            
+            // Display key metrics with proper escaping
+            echo "<div class='val-box'>
                 <i class='fas fa-users'></i>
                 <div>
-                    <h3>$totalStudents</h3>
+                    <h3>" . htmlspecialchars($totalStudents, ENT_QUOTES, 'UTF-8') . "</h3>
                     <span>Total Students</span>
                 </div>
             </div>";
@@ -92,7 +104,7 @@ if($conn->connect_error)
             echo "<div class='val-box'>
                 <i class='fas fa-music'></i>
                 <div>
-                    <h3>$totalCourses</h3>
+                    <h3>" . htmlspecialchars($totalCourses, ENT_QUOTES, 'UTF-8') . "</h3>
                     <span>Total Courses</span>
                 </div>
             </div>";
@@ -100,7 +112,7 @@ if($conn->connect_error)
             echo "<div class='val-box'>
                 <i class='fas fa-book'></i>
                 <div>
-                    <h3>$totalEnrollments</h3>
+                    <h3>" . htmlspecialchars($totalEnrollments, ENT_QUOTES, 'UTF-8') . "</h3>
                     <span>Total Enrollments</span>
                 </div>
             </div>";
@@ -108,33 +120,50 @@ if($conn->connect_error)
             echo "<div class='val-box'>
                 <i class='fas fa-rupee-sign'></i>
                 <div>
-                    <h3>₹$totalRevenue</h3>
+                    <h3>₹" . htmlspecialchars($totalRevenue, ENT_QUOTES, 'UTF-8') . "</h3>
                     <span>Total Revenue</span>
                 </div>
             </div>";
+        } catch (Exception $e) {
+            error_log("Admin Panel Error: " . $e->getMessage());
+            echo "<div style='color:red;'>Error loading statistics</div>";
+        }
         ?>
         </div>
 
         <div class="values">
         <h4 style='margin-bottom: 15px;'>Courses by Category</h4>
         <?php
-             // Query courses by dance category
-             $categories = ['Bharatanatyam', 'Kathak', 'Hip-Hop', 'Break Dance', 'Ballet', 'Salsa', 'Fusion'];
-             
-             foreach($categories as $category) {
-                 $sql = "SELECT COUNT(*) as count FROM courses WHERE category = '$category'";
-                 $result = $conn->query($sql);
-                 $row = $result->fetch_assoc();
-                 $count = $row['count'];
-                 
-                 echo "<div class='val-box'>
-                    <i class='fas fa-music'></i>
-                    <div>
-                        <h3>$count</h3>
-                        <span>$category</span>
-                    </div>
-                </div>";
-             }
+        try {
+            // Query courses by dance category using prepared statement
+            $categories = ['Bharatanatyam', 'Kathak', 'Hip-Hop', 'Break Dance', 'Ballet', 'Salsa', 'Fusion'];
+            
+            foreach($categories as $category) {
+                $stmt = $conn->prepare("SELECT COUNT(*) as count FROM courses WHERE category = ?");
+                if(!$stmt) throw new Exception("Prepare failed");
+                
+                $stmt->bind_param("s", $category);
+                if(!$stmt->execute()) throw new Exception("Execute failed");
+                
+                $result = $stmt->get_result();
+                $row = $result->fetch_assoc();
+                $count = htmlspecialchars($row['count'], ENT_QUOTES, 'UTF-8');
+                $categoryEscaped = htmlspecialchars($category, ENT_QUOTES, 'UTF-8');
+                
+                echo "<div class='val-box'>
+                   <i class='fas fa-music'></i>
+                   <div>
+                       <h3>" . $count . "</h3>
+                       <span>" . $categoryEscaped . "</span>
+                   </div>
+               </div>";
+               
+                $stmt->close();
+            }
+        } catch (Exception $e) {
+            error_log("Category Query Error: " . $e->getMessage());
+            echo "<div style='color:red;'>Error loading category data</div>";
+        }
         ?>
         </div>
     </section>

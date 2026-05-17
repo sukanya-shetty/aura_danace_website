@@ -1,17 +1,10 @@
 <?php
+require 'config.php';
 session_start();
 if(!isset($_SESSION["log"])){
     header(("Location:Login.html"));
     exit();
 }
- $server='localhost';
- $uname='root';
- $password='';
- $db='aura_dance';
- $conn=new mysqli($server,$uname,$password,$db);
- if($conn->connect_error){
-    die("Connection failed: ".$conn->connect_error);
- }
  ?>
 
 <!DOCTYPE html>

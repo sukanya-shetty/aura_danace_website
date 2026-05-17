@@ -1,47 +1,61 @@
 <?php
 session_start();
- $server='localhost';
- $uname='root';
- $password='';
- $db='aura_dance';
- $conn=new mysqli($server,$uname,$password,$db);
-
- if($conn->connect_error){
-    die("Connection failed: ".$conn->connect_error);
- }
+require 'config.php';
  
- if($_SERVER["REQUEST_METHOD"]==="POST"){
-    $name=$_POST['uname'];
-    $inputPassword=$_POST['password'];
-
-    $sql="SELECT username, password FROM users WHERE username='$name'";
-    $adresult=$conn->query($sql);
-    if($adresult->num_rows==1){
-        $row=$adresult->fetch_assoc();
-        // Verify hashed password using password_verify
-        if(password_verify($inputPassword, $row['password'])){
-            $_SESSION['uname']=$name;
-            echo("<script language='javascript'>
-            window.alert('Login Successful')
-            window.location.href='adminpanel.php'
-            </script>");
-            exit();
-        }else{
-            echo("<script language='javascript'>
-            window.alert('Either the username or password is incorrect please re-enter')
-            window.location.href='ww.html'
-            </script>");
-            exit();
+if($_SERVER["REQUEST_METHOD"]==="POST"){
+    try {
+        // Sanitize input
+        $name = trim($_POST['uname'] ?? '');
+        $inputPassword = $_POST['password'] ?? '';
+        
+        // Input validation
+        if(empty($name) || empty($inputPassword)){
+            throw new Exception('Username and password are required');
         }
-    }else{
+
+        // Query using prepared statement
+        $stmt = $conn->prepare("SELECT username, password FROM users WHERE username = ?");
+        if(!$stmt){
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+        
+        $stmt->bind_param("s", $name);
+        if(!$stmt->execute()){
+            throw new Exception("Execute failed: " . $stmt->error);
+        }
+        
+        $adresult = $stmt->get_result();
+        
+        if($adresult->num_rows == 1){
+            $row = $adresult->fetch_assoc();
+            // Verify hashed password using password_verify
+            if(password_verify($inputPassword, $row['password'])){
+                $_SESSION['uname'] = $name;
+                
+                echo("<script language='javascript'>
+                window.alert('Login Successful')
+                window.location.href='adminpanel.php'
+                </script>");
+                exit();
+            }else{
+                throw new Exception('Either the username or password is incorrect');
+            }
+        }else{
+            throw new Exception('Admin account not found');
+        }
+        
+        $stmt->close();
+        
+    } catch (Exception $e) {
+        error_log($e->getMessage());
         echo("<script language='javascript'>
-        window.alert('Admin account not found')
+        window.alert('" . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "')
         window.location.href='ww.html'
         </script>");
         exit();
     }
- }
- ?>
+}
+?>
 
 
 <!DOCTYPE html>

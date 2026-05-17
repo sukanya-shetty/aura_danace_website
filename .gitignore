@@ -1,0 +1,36 @@
+# Environment & Configuration
+.env
+.env.local
+mailer-config.php
+config.php
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+error_log
+debug_log
+
+# Dependencies
+vendor/
+node_modules/
+composer.lock
+
+# Temporary Files
+*.tmp
+*.temp
+.cache/
+
+# Database Backups
+*.sql
+*.bak
+
+# OS Files
+Thumbs.db
+.DS_Store

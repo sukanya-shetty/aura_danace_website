@@ -1,16 +1,6 @@
 <?php
- $server="localhost";
- $uname="root";
- $password="";
- $db="aura_dance";
- 
- $conn=new mysqli($server,$uname,$password,$db);
- if($conn->connect_error)
- {
-     die("Connection failed:".$conn->connect_error);
- }
-
- ?>
+require 'config.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,41 +63,95 @@
               </nav>
               
     <?php
-            $cat=$_GET["cat"];
-  echo"<center><h1 style='padding-top:75px'>$cat Dance Forms</h1></center>";
-  ?>
+        try {
+            // Sanitize category input
+            $cat = isset($_GET["cat"]) ? trim($_GET["cat"]) : '';
+            
+            if(empty($cat)){
+                throw new Exception("Invalid category selection");
+            }
+            
+            // Escape for display
+            $catDisplay = htmlspecialchars($cat, ENT_QUOTES, 'UTF-8');
+            echo "<center><h1 style='padding-top:75px'>" . $catDisplay . " Dance Forms</h1></center>";
+        } catch (Exception $e) {
+            echo "<center><h1 style='color:red; padding-top:75px'>" . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "</h1></center>";
+        }
+    ?>
         <div class="container">
         <div class="row">
     <?php
-        $cat=$_GET["cat"];
-        // Check if category exists
-        $sql="SELECT cat FROM category where cat='$cat'";
-        $result=$conn->query($sql);
-        if($result->num_rows==1){
-            // Query courses table for courses in this category
-            $sqli="SELECT course_name, course_name as form, instructor_name as con FROM courses WHERE category='$cat'";
-            $res=$conn->query($sqli);
-            if($res->num_rows>0){
-                while($row=$res->fetch_assoc()){
-                    $courseName=$row["form"];
-                    $instructor=$row["con"];
-                    echo"
-                    <div class='col-12 col-md-4'>
-                    <div class='card' style='width: 18rem; margin-top:40px'>
-                    <div class='card-img-top' style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 200px; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; text-align: center; padding: 20px;'>
-                    <i class='fa fa-music' style='font-size: 40px;'></i>
-                    </div>
-                    <div class='card-body'>
-                      <h5 class='card-title'>$courseName</h5>
-                      <p class='card-text' style='color:black;'><strong>Instructor:</strong> $instructor</p>
-                      <a href='course.php?course_name=" . urlencode($courseName) . "' class='btn btn-primary'>Enroll Now</a>
-                    </div>
-                  </div> 
-                  </div>";
-                }
-            }else{
-                echo "No dance courses added yet in this category";
+        try {
+            // Sanitize category input
+            $cat = isset($_GET["cat"]) ? trim($_GET["cat"]) : '';
+            
+            if(empty($cat)){
+                throw new Exception("Invalid category selection");
             }
+            
+            // Check if category exists using prepared statement
+            $categoryStmt = $conn->prepare("SELECT cat FROM category WHERE cat = ?");
+            if(!$categoryStmt){
+                throw new Exception("Prepare failed: " . $conn->error);
+            }
+            
+            $categoryStmt->bind_param("s", $cat);
+            if(!$categoryStmt->execute()){
+                throw new Exception("Execute failed: " . $categoryStmt->error);
+            }
+            
+            $categoryResult = $categoryStmt->get_result();
+            
+            if($categoryResult->num_rows == 1){
+                // Query courses table for courses in this category using prepared statement
+                $courseStmt = $conn->prepare("SELECT course_name, instructor_name FROM courses WHERE category = ?");
+                if(!$courseStmt){
+                    throw new Exception("Prepare failed: " . $conn->error);
+                }
+                
+                $courseStmt->bind_param("s", $cat);
+                if(!$courseStmt->execute()){
+                    throw new Exception("Execute failed: " . $courseStmt->error);
+                }
+                
+                $courseResult = $courseStmt->get_result();
+                
+                if($courseResult->num_rows > 0){
+                    while($row = $courseResult->fetch_assoc()){
+                        $courseName = htmlspecialchars($row["course_name"], ENT_QUOTES, 'UTF-8');
+                        $instructor = htmlspecialchars($row["instructor_name"], ENT_QUOTES, 'UTF-8');
+                        $courseNameUrl = urlencode($row["course_name"]);
+                        
+                        echo "
+                        <div class='col-12 col-md-4'>
+                        <div class='card' style='width: 18rem; margin-top:40px'>
+                        <div class='card-img-top' style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 200px; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; text-align: center; padding: 20px;'>
+                        <i class='fa fa-music' style='font-size: 40px;'></i>
+                        </div>
+                        <div class='card-body'>
+                          <h5 class='card-title'>" . $courseName . "</h5>
+                          <p class='card-text' style='color:black;'><strong>Instructor:</strong> " . $instructor . "</p>
+                          <a href='course.php?course_name=" . $courseNameUrl . "' class='btn btn-primary'>Enroll Now</a>
+                        </div>
+                      </div> 
+                      </div>";
+                    }
+                }else{
+                    echo "<p style='text-align:center; color:red;'>No dance courses added yet in this category</p>";
+                }
+                
+                $courseStmt->close();
+            }else{
+                throw new Exception("Category not found");
+            }
+            
+            $categoryStmt->close();
+            
+        } catch (Exception $e) {
+            error_log("Dance Form Error: " . $e->getMessage());
+            echo "<p style='text-align:center; color:red;'>" . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "</p>";
+        }
+    ?>
         }else{
             echo "No Dance category found";
         }

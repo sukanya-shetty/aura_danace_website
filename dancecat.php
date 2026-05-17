@@ -1,16 +1,6 @@
 <?php
- $server="localhost";
- $uname="root";
- $password="";
- $db="aura_dance";
- 
- $conn=new mysqli($server,$uname,$password,$db);
- if($conn->connect_error)
- {
-     die("Connection failed:".$conn->connect_error);
- }
-
- ?>
+require 'config.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,23 +63,36 @@
         </div>
         <div class="col-md-6">
      <?php
-    $sql="SELECT * FROM category";
-    $result=$conn->query($sql);
-    if($result->num_rows>0){
-        while($row=$result->fetch_assoc()){
-            $cat=$row["cat"];
-            $context=$row["context"];
-            echo"
-            <div class='card text-center mb-3'style='width:900px; margin-left:-250px;'>
-            <div class='card-body'>
-              <h5 class='card-title'>$cat</h5>
-              <p class='card-text' style='color:black;'>$context</p>
-              <a href='danceform.php?cat=$cat' class='btn btn-primary'>View Dance Forms</a>
-            </div>
-          </div><br>";
+    try {
+        $sql = "SELECT * FROM category";
+        $result = $conn->query($sql);
+        
+        if(!$result){
+            throw new Exception("Query failed: " . $conn->error);
         }
-    }else{
-        echo("<h3>No Dance Category is added</h3>");
+        
+        if($result->num_rows > 0){
+            while($row = $result->fetch_assoc()){
+                // Sanitize output to prevent XSS
+                $cat = htmlspecialchars($row["cat"], ENT_QUOTES, 'UTF-8');
+                $context = htmlspecialchars($row["context"], ENT_QUOTES, 'UTF-8');
+                $catUrl = urlencode($row["cat"]);
+                
+                echo "
+                <div class='card text-center mb-3' style='width:900px; margin-left:-250px;'>
+                <div class='card-body'>
+                  <h5 class='card-title'>" . $cat . "</h5>
+                  <p class='card-text' style='color:black;'>" . $context . "</p>
+                  <a href='danceform.php?cat=" . $catUrl . "' class='btn btn-primary'>View Dance Forms</a>
+                </div>
+              </div><br>";
+            }
+        }else{
+            echo "<h3>No Dance Category is added</h3>";
+        }
+    } catch (Exception $e) {
+        error_log("Dance Category Error: " . $e->getMessage());
+        echo "<h3 style='color:red;'>" . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "</h3>";
     }
     ?>
             </div>

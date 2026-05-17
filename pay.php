@@ -1,46 +1,62 @@
 <?php
+require 'config.php';
 session_start();
- $server='localhost';
- $uname='root';
- $password='';
- $db='aura_dance';
- $conn=new mysqli($server,$uname,$password,$db);
- if($conn->connect_error){
-    die("Connection failed: ".$conn->connect_error);
- }
- if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if(isset($_POST['payment_success']) && $_POST['payment_success'] == '1') {
-        // Get enrollment data from session
-        if(isset($_SESSION['enrollment_data'])) {
-            $enrollment_data = $_SESSION['enrollment_data'];
-            $student_id = $enrollment_data['student_id'];
-            $course_id = $enrollment_data['course_id'];
-            $amount = $enrollment_data['amount'];
-            
-            // Insert into enrollments table
-            $enrollSQL = "INSERT INTO enrollments(student_id, course_id, enrollment_date, status)
-                         VALUES($student_id, $course_id, NOW(), 'active')";
-            
-            if($conn->query($enrollSQL) === TRUE) {
-                // Insert into payments table
-                $paymentSQL = "INSERT INTO payments(student_id, course_id, amount, payment_date, status)
-                             VALUES($student_id, $course_id, $amount, NOW(), 'success')";
-                
-                if($conn->query($paymentSQL) === TRUE) {
-                    // Clear session data
-                    unset($_SESSION['enrollment_data']);
-                    header("Location:thankyou.php");
-                } else {
-                    echo "Payment Error: ".$conn->error;
-                }
-            } else {
-                echo "Enrollment Error: ".$conn->error;
-            }
-        } else {
-            echo "Error: Enrollment data not found in session.";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    try {
+        if(!isset($_POST['payment_success']) || $_POST['payment_success'] != '1') {
+            throw new Exception("Invalid payment request");
         }
+        
+        // Get enrollment data from session
+        if(!isset($_SESSION['enrollment_data'])) {
+            throw new Exception("Enrollment data not found in session");
+        }
+        
+        $enrollment_data = $_SESSION['enrollment_data'];
+        $student_id = intval($enrollment_data['student_id'] ?? 0);
+        $course_id = intval($enrollment_data['course_id'] ?? 0);
+        $amount = floatval($enrollment_data['amount'] ?? 0);
+        
+        if($student_id <= 0 || $course_id <= 0 || $amount <= 0){
+            throw new Exception("Invalid enrollment data");
+        }
+        
+        // Insert into enrollments table using prepared statement
+        $enrollStmt = $conn->prepare("INSERT INTO enrollments(student_id, course_id, enrollment_date, status) VALUES(?, ?, NOW(), 'active')");
+        if(!$enrollStmt){
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+        
+        $enrollStmt->bind_param("ii", $student_id, $course_id);
+        if(!$enrollStmt->execute()){
+            throw new Exception("Enrollment failed: " . $enrollStmt->error);
+        }
+        $enrollStmt->close();
+        
+        // Insert into payments table using prepared statement
+        $paymentStmt = $conn->prepare("INSERT INTO payments(student_id, course_id, amount, payment_date, status) VALUES(?, ?, ?, NOW(), 'success')");
+        if(!$paymentStmt){
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+        
+        $paymentStmt->bind_param("iid", $student_id, $course_id, $amount);
+        if(!$paymentStmt->execute()){
+            throw new Exception("Payment recording failed: " . $paymentStmt->error);
+        }
+        $paymentStmt->close();
+        
+        // Clear session data and redirect
+        unset($_SESSION['enrollment_data']);
+        header("Location:thankyou.php");
+        exit();
+        
+    } catch (Exception $e) {
+        error_log("Payment Error: " . $e->getMessage());
+        echo "<div style='color: red; padding: 20px;'>Payment Error: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "</div>";
+        exit();
     }
- }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

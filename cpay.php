@@ -1,13 +1,6 @@
 <?php
+require 'config.php';
 session_start();
- $server='localhost';
- $uname='root';
- $password='';
- $db='aura_dance';
- $conn=new mysqli($server,$uname,$password,$db);
- if($conn->connect_error){
-    die("Connection failed: ".$conn->connect_error);
- }
  if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(isset($_POST['payment_success']) && $_POST['payment_success'] == '1') {
         // Get enrollment data from session

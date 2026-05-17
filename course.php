@@ -1,20 +1,17 @@
 <?php
+require 'config.php';
 session_start();
 if(!isset($_SESSION["log"])){
-    header(("Location:Login.html"));
+    header("Location:Login.html");
     exit();
 }
- $server='localhost';
- $uname='root';
- $password='';
- $db='aura_dance';
- $conn=new mysqli($server,$uname,$password,$db);
- if($conn->connect_error){
-    die("Connection failed: ".$conn->connect_error);
- }
 
- 
- ?>
+// Get and sanitize course name parameter
+$courseName = isset($_GET['course_name']) ? trim($_GET['course_name']) : '';
+if(empty($courseName)){
+    die("Invalid course selection");
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -64,41 +61,67 @@ if(!isset($_SESSION["log"])){
                 </div>
 
                 <?php
-                    $courseName = isset($_GET['course_name']) ? $_GET['course_name'] : '';
-                    $sql="SELECT * FROM courses WHERE course_name='$courseName'";
-                    $result=$conn->query($sql);
-                       if($result->num_rows==1){
-                           $row=$result->fetch_assoc();
-                            $form=$row['course_name'];
-                            $category=$row['category'];
-                            $amt=$row['fee'];
-                            $instructor=$row['instructor_name'];
-                               echo"<div class='user'>
-                               <label>Dance Category</label>
-                               <input type='text' name='cat' id='form' value='$category' disabled style='color: white;' required>
-                           </div>
-                               
-                               <div class='user'>
-                               <label>Dance Form</label>
-                               <input type='text' name='form' id='form' value='$form' disabled style='color: white;' required>
-                               <input type='hidden' name='form' value='$form' required>
-                           </div>
-
-                               <div class='user'>
-                               <label>Instructor</label>
-                               <input type='text' name='instructor' id='instructor' value='$instructor' disabled style='color: white;' required>
-                           </div>
-
-                               <div class='user'>
-                               <label>Amount</label>
-                               <input type='text' name='amt' id='amt' value='₹$amt' style='color: white;'disabled required>
-                               <input type='hidden' name='amt' value='$amt' required>
-                           </div>";
-                           }else{
-                               echo "Course not found. Please select a valid course.";
-                           }
+                    try {
+                        $courseName = isset($_GET['course_name']) ? trim($_GET['course_name']) : '';
                         
-                 ?>
+                        if(empty($courseName)){
+                            throw new Exception("Invalid course selection");
+                        }
+                        
+                        // Use prepared statement to prevent SQL injection
+                        $stmt = $conn->prepare("SELECT course_name, category, fee, instructor_name FROM courses WHERE course_name = ?");
+                        if(!$stmt){
+                            throw new Exception("Prepare failed: " . $conn->error);
+                        }
+                        
+                        $stmt->bind_param("s", $courseName);
+                        if(!$stmt->execute()){
+                            throw new Exception("Execute failed: " . $stmt->error);
+                        }
+                        
+                        $result = $stmt->get_result();
+                        
+                        if($result->num_rows == 1){
+                            $row = $result->fetch_assoc();
+                            
+                            // Sanitize output to prevent XSS
+                            $form = htmlspecialchars($row['course_name'], ENT_QUOTES, 'UTF-8');
+                            $category = htmlspecialchars($row['category'], ENT_QUOTES, 'UTF-8');
+                            $amt = htmlspecialchars($row['fee'], ENT_QUOTES, 'UTF-8');
+                            $instructor = htmlspecialchars($row['instructor_name'], ENT_QUOTES, 'UTF-8');
+                            
+                            echo "<div class='user'>
+                                <label>Dance Category</label>
+                                <input type='text' name='cat' id='form' value='" . $category . "' disabled style='color: white;' required>
+                            </div>
+                            
+                            <div class='user'>
+                                <label>Dance Form</label>
+                                <input type='text' name='form' id='form' value='" . $form . "' disabled style='color: white;' required>
+                                <input type='hidden' name='form' value='" . $form . "' required>
+                            </div>
+                            
+                            <div class='user'>
+                                <label>Instructor</label>
+                                <input type='text' name='instructor' id='instructor' value='" . $instructor . "' disabled style='color: white;' required>
+                            </div>
+                            
+                            <div class='user'>
+                                <label>Amount</label>
+                                <input type='text' name='amt' id='amt' value='₹" . $amt . "' style='color: white;' disabled required>
+                                <input type='hidden' name='amt' value='" . $amt . "' required>
+                            </div>";
+                        }else{
+                            throw new Exception("Course not found. Please select a valid course.");
+                        }
+                        
+                        $stmt->close();
+                        
+                    } catch (Exception $e) {
+                        error_log($e->getMessage());
+                        echo "<div style='color: red; padding: 10px;'>" . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "</div>";
+                    }
+                ?>
 
                 <div class="user">
                     <label>Level</label>

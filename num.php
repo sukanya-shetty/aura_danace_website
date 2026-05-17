@@ -1,14 +1,5 @@
 <?php
-$server="localhost";
-$uname="root";
-$password="";
-$db="aura_dance";
-
-$conn=new mysqli($server,$uname,$password,$db);
-if($conn->connect_error)
-{
-    die("Connection failed:".$conn->connect_error);
-}
+require 'config.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">

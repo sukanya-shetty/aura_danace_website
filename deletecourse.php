@@ -1,35 +1,61 @@
 <?php
-$server="localhost";
-$uname="root";
-$password="";
-$db="aura_dance";
-
-$conn=new mysqli($server,$uname,$password,$db);
-if($conn->connect_error) {
-    die("Connection failed:".$conn->connect_error);
-}
+require 'config.php';
 
 if(isset($_GET['course_id'])) {
-    $course_id = $_GET['course_id'];
+    $course_id = isset($_GET['course_id']) ? intval($_GET['course_id']) : 0;
     
-    // First, delete all enrollments for this course
-    $deleteEnrollments = "DELETE FROM enrollments WHERE course_id=$course_id";
-    $conn->query($deleteEnrollments);
+    if($course_id <= 0) {
+        die("Invalid course ID");
+    }
     
-    // Then delete all payments for this course
-    $deletePayments = "DELETE FROM payments WHERE course_id=$course_id";
-    $conn->query($deletePayments);
-    
-    // Finally, delete the course
-    $sql = "DELETE FROM courses WHERE course_id=$course_id";
-    if($conn->query($sql)) {
+    try {
+        // Delete in order: enrollments -> payments -> course (foreign key constraints)
+        
+        // Delete all enrollments for this course using prepared statement
+        $stmt = $conn->prepare("DELETE FROM enrollments WHERE course_id = ?");
+        if(!$stmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+        $stmt->bind_param("i", $course_id);
+        if(!$stmt->execute()) {
+            throw new Exception("Enrollment deletion failed: " . $stmt->error);
+        }
+        $stmt->close();
+        
+        // Delete all payments for this course using prepared statement
+        $stmt = $conn->prepare("DELETE FROM payments WHERE course_id = ?");
+        if(!$stmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+        $stmt->bind_param("i", $course_id);
+        if(!$stmt->execute()) {
+            throw new Exception("Payment deletion failed: " . $stmt->error);
+        }
+        $stmt->close();
+        
+        // Delete the course using prepared statement
+        $stmt = $conn->prepare("DELETE FROM courses WHERE course_id = ?");
+        if(!$stmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+        $stmt->bind_param("i", $course_id);
+        if(!$stmt->execute()) {
+            throw new Exception("Course deletion failed: " . $stmt->error);
+        }
+        $stmt->close();
+        
         echo "<script language='javascript'>
         window.alert('Course deleted successfully')
         window.location.href='studentform.php'
         </script>";
         exit;
-    } else {
-        echo "Error deleting course: " . $conn->error;
+    } catch (Exception $e) {
+        error_log("Course deletion error: " . $e->getMessage());
+        echo "<script language='javascript'>
+        window.alert('Error deleting course. Please try again later.')
+        window.location.href='studentform.php'
+        </script>";
+        exit;
     }
 }
 
